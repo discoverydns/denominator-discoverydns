@@ -46,8 +46,10 @@ Include the following dependencies in your Gradle project:
        compile 'com.netflix.feign:feign-gson:8.1.0'
     }
 
+### In the code
 Then you can create your DiscoveryDNS Provider as:
-DNSApiManager manager = Denominator.create("discoverydns", credentials(certificate, privateKey));
+
+    DNSApiManager manager = Denominator.create("discoverydns", credentials(certificate, privateKey));
 
 ### As a CLI provider
 TODO

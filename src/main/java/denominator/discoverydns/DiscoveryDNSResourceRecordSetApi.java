@@ -1,6 +1,7 @@
 package denominator.discoverydns;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,14 +46,13 @@ final class DiscoveryDNSResourceRecordSetApi implements ResourceRecordSetApi {
     DiscoveryDNS.Zone ddnsZone = api.getZone(zoneId);
     List<ResourceRecordSet<?>> records = new ArrayList<ResourceRecordSet<?>>();
     for (ResourceRecordSet<?> record : ddnsZone.zone.resourceRecords.records) {
-      if (!name.equals(record.name()) || !type.equals(record.type())) {
+      if (!name.equals(record.name()) || !type.equals(record.type())
+          && (appends.length == 0 || !appends[0].ttl().equals(record.ttl()))) {
         records.add(record);
       }
     }
     if (appends != null) {
-      for (ResourceRecordSet<?> append : appends) {
-        records.add(append);
-      }
+      Collections.addAll(records, appends);
     }
 
     DiscoveryDNS.Zone ddnsUpdateZone = new DiscoveryDNS.Zone();

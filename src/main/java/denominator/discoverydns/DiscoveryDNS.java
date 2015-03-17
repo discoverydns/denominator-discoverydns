@@ -22,7 +22,7 @@ interface DiscoveryDNS {
   @RequestLine("GET /zones/{id}")
   Zone getZone(@Param("id") String id);
 
-  @RequestLine("PUT /zones/{id}/resourcerecords?rdataFormat=raw")
+  @RequestLine("PUT /zones/{id}/resourcerecords")
   void updateZone(@Param("id") String id, Zone zone);
 
   static final class ResourceRecords {

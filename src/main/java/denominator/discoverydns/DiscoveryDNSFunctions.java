@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
 import denominator.model.rdata.AAAAData;
 import denominator.model.rdata.AData;
@@ -121,6 +122,54 @@ public final class DiscoveryDNSFunctions {
     }
   }
 
+  static void toJson(JsonWriter jsonWriter, String rrType, Map<String, Object> rdata) throws IOException {
+    if ("A".equals(rrType)) {
+      jsonWriter.name("address").value((String) rdata.get("address"));
+    } else if ("NS".equals(rrType)) {
+      jsonWriter.name("target").value((String) rdata.get("nsdname"));
+    } else if ("CNAME".equals(rrType)) {
+      jsonWriter.name("target").value((String) rdata.get("cname"));
+    } else if ("PTR".equals(rrType)) {
+      jsonWriter.name("target").value((String) rdata.get("ptrdname"));
+    } else if ("MX".equals(rrType)) {
+      jsonWriter.name("priority").value((Integer) rdata.get("preference"));
+      jsonWriter.name("target").value((String) rdata.get("exchange"));
+    } else if ("TXT".equals(rrType)) {
+      jsonWriter.name("strings");
+      writeMultipleStrings(jsonWriter, (String) rdata.get("txtdata"));
+    } else if ("AAAA".equals(rrType)) {
+      jsonWriter.name("address").value((String) rdata.get("address"));
+    } else if ("SRV".equals(rrType)) {
+      jsonWriter.name("priority").value((Integer) rdata.get("priority"));
+      jsonWriter.name("weight").value((Integer) rdata.get("weight"));
+      jsonWriter.name("port").value((Integer) rdata.get("port"));
+      jsonWriter.name("target").value((String) rdata.get("target"));
+    } else if ("NAPTR".equals(rrType)) {
+      jsonWriter.name("order").value((Integer) rdata.get("order"));
+      jsonWriter.name("preference").value((Integer) rdata.get("preference"));
+      jsonWriter.name("flags").value((String) rdata.get("flags"));
+      jsonWriter.name("service").value((String) rdata.get("services"));
+      jsonWriter.name("regexp").value((String) rdata.get("regexp"));
+      jsonWriter.name("replacement").value((String) rdata.get("replacement"));
+    } else if ("CERT".equals(rrType)) {
+      jsonWriter.name("certType").value((Integer) rdata.get("format"));
+      jsonWriter.name("keyTag").value((Integer) rdata.get("tag"));
+      jsonWriter.name("algorithm").value((Integer) rdata.get("algorithm"));
+      jsonWriter.name("cert").value((String) rdata.get("certificate"));
+    } else if ("SSHFP".equals(rrType)) {
+      jsonWriter.name("algorithm").value((Integer) rdata.get("algorithm"));
+      jsonWriter.name("digestType").value((Integer) rdata.get("fptype"));
+      jsonWriter.name("fingerprint").value((String) rdata.get("fingerprint"));
+    } else if ("SPF".equals(rrType)) {
+      jsonWriter.name("strings");
+      writeMultipleStrings(jsonWriter, (String) rdata.get("txtdata"));
+    } else {
+      for (Map.Entry<String, Object> rDataField : rdata.entrySet()) {
+        jsonWriter.name(rDataField.getKey()).value((String) rDataField.getValue());
+      }
+    }
+  }
+
   private static String concatenateMultipleStrings(Object strings) {
     if (strings instanceof String[]) {
       String concatenatedStrings = "";
@@ -133,6 +182,19 @@ public final class DiscoveryDNSFunctions {
       return concatenatedStrings;
     } else {
       return (String) strings;
+    }
+  }
+
+  private static void writeMultipleStrings(JsonWriter jsonWriter, String strings) throws IOException {
+    if (strings.startsWith("\"") && strings.endsWith("\"")) {
+      final String[] split = strings.substring(1, strings.length() - 1).split("\" \"");
+      jsonWriter.beginArray();
+      for (String string : split) {
+        jsonWriter.value(string);
+      }
+      jsonWriter.endArray();
+    } else {
+      jsonWriter.value(strings);
     }
   }
 }

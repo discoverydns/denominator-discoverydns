@@ -13,7 +13,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import denominator.common.Util;
+import denominator.discoverydns.DiscoveryDNS.RecordSetDetails;
+import denominator.discoverydns.DiscoveryDNS.Record;
 import denominator.discoverydns.DiscoveryDNS.ResourceRecords;
 import denominator.model.ResourceRecordSet;
 
@@ -33,7 +34,7 @@ final class DiscoveryDNSAdapters {
           jsonWriter.name("ttl").value(rrset.ttl() == null ? "3600"
                                                            : rrset.ttl().toString());
           jsonWriter.name("type").value(rrset.type());
-          jsonWriter.name("rdata").value(Util.flatten(rdata));
+          DiscoveryDNSFunctions.toJson(jsonWriter, rrset.type(), rdata);
           jsonWriter.endObject();
         }
       }
@@ -42,26 +43,25 @@ final class DiscoveryDNSAdapters {
 
     @Override
     public ResourceRecords read(JsonReader in) throws IOException {
-      Map<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>> rrsets
-          = new LinkedHashMap<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>>();
+      Map<RecordSetDetails, Collection<Record>> rrsets = new LinkedHashMap<RecordSetDetails, Collection<Record>>();
       in.beginArray();
       while (in.hasNext()) {
-        DiscoveryDNS.Record record = toRecord(in);
+        Record record = toRecord(in);
         if (!rrsets.containsKey(record.recordSetDetails)) {
-          rrsets.put(record.recordSetDetails, new ArrayList<DiscoveryDNS.Record>());
+          rrsets.put(record.recordSetDetails, new ArrayList<Record>());
         }
         rrsets.get(record.recordSetDetails).add(record);
       }
       in.endArray();
 
-      DiscoveryDNS.ResourceRecords ddnsRecords = new DiscoveryDNS.ResourceRecords();
-      for (Map.Entry<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>> entry : rrsets.entrySet()) {
-        DiscoveryDNS.RecordSetDetails rrSetDetails = entry.getKey();
+      ResourceRecords ddnsRecords = new ResourceRecords();
+      for (Map.Entry<RecordSetDetails, Collection<Record>> entry : rrsets.entrySet()) {
+        RecordSetDetails rrSetDetails = entry.getKey();
         ResourceRecordSet.Builder<Map<String, Object>> builder = ResourceRecordSet.builder()
             .name(rrSetDetails.name)
             .type(rrSetDetails.type)
             .ttl(rrSetDetails.ttl);
-        for (DiscoveryDNS.Record record : entry.getValue()) {
+        for (Record record : entry.getValue()) {
           builder.add(toRDataMap(record));
         }
         ddnsRecords.records.add(builder.build());

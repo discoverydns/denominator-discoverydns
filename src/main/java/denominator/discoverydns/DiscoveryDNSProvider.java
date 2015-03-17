@@ -65,8 +65,8 @@ public class DiscoveryDNSProvider extends BasicProvider {
   @Override
   public Set<String> basicRecordTypes() {
     Set<String> types = new LinkedHashSet<String>();
-    types.addAll(Arrays.asList("NS", "A", "AAAA", "MX", "CNAME", "SRV", "TXT", "PTR",
-                               "DS", "CERT", "NAPTR", "SSHFP", "LOC", "SPF", "TLSA"));
+    types.addAll(Arrays.asList("A", "NS", "CNAME", "PTR", "MX", "TXT", "AAAA", "LOC", "SRV", "NAPTR",
+        "CERT", "DS", "SSHFP", "DNSKEY", "TLSA", "SPF", "ZONECNAME", "URL", "MAILFW"));
     return types;
   }
 

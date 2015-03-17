@@ -1,5 +1,8 @@
 package denominator.discoverydns;
 
+import static denominator.discoverydns.DiscoveryDNSFunctions.toRDataMap;
+import static denominator.discoverydns.DiscoveryDNSFunctions.toRecord;
+
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -39,71 +42,31 @@ final class DiscoveryDNSAdapters {
 
     @Override
     public ResourceRecords read(JsonReader in) throws IOException {
-      Map<Query, Collection<String>>
-          rrsets =
-          new LinkedHashMap<Query, Collection<String>>();
+      Map<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>> rrsets
+          = new LinkedHashMap<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>>();
       in.beginArray();
       while (in.hasNext()) {
-        in.beginObject();
-        Query query = new Query();
-        String rdata = null;
-        while (in.hasNext()) {
-          String name = in.nextName();
-          if (name.equals("name")) {
-            query.name = in.nextString();
-          } else if (name.equals("type")) {
-            query.type = in.nextString();
-          } else if (name.equals("ttl")) {
-            query.ttl = in.nextInt();
-          } else if (name.equals("rdata")) {
-            rdata = in.nextString();
-          } else {
-            in.skipValue();
-          }
+        DiscoveryDNS.Record record = toRecord(in);
+        if (!rrsets.containsKey(record.recordSetDetails)) {
+          rrsets.put(record.recordSetDetails, new ArrayList<DiscoveryDNS.Record>());
         }
-        in.endObject();
-        if (!rrsets.containsKey(query)) {
-          rrsets.put(query, new ArrayList<String>());
-        }
-        rrsets.get(query).add(rdata);
+        rrsets.get(record.recordSetDetails).add(record);
       }
       in.endArray();
 
       DiscoveryDNS.ResourceRecords ddnsRecords = new DiscoveryDNS.ResourceRecords();
-      for (Map.Entry<Query, Collection<String>> entry : rrsets.entrySet()) {
-        Query id = entry.getKey();
+      for (Map.Entry<DiscoveryDNS.RecordSetDetails, Collection<DiscoveryDNS.Record>> entry : rrsets.entrySet()) {
+        DiscoveryDNS.RecordSetDetails rrSetDetails = entry.getKey();
         ResourceRecordSet.Builder<Map<String, Object>> builder = ResourceRecordSet.builder()
-            .name(id.name)
-            .type(id.type)
-            .ttl(id.ttl);
-        for (String rdata : entry.getValue()) {
-          builder.add(Util.toMap(id.type, rdata));
+            .name(rrSetDetails.name)
+            .type(rrSetDetails.type)
+            .ttl(rrSetDetails.ttl);
+        for (DiscoveryDNS.Record record : entry.getValue()) {
+          builder.add(toRDataMap(record));
         }
         ddnsRecords.records.add(builder.build());
       }
       return ddnsRecords;
-    }
-  }
-
-  private static class Query {
-
-    String name;
-    String type;
-    Integer ttl;
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((name == null) ? 0 : name.hashCode());
-      result = prime * result + ((ttl == null) ? 0 : ttl.hashCode());
-      result = prime * result + ((type == null) ? 0 : type.hashCode());
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return hashCode() == obj.hashCode();
     }
   }
 }

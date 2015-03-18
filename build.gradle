@@ -2,11 +2,21 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.6
 
-repositories { 
+repositories {
 	jcenter()
+    flatDir {
+        name "distFolder"
+        dirs "dist"
+    }
 }
 apply from: file('dagger.gradle')
 version = "0.0.1"
+
+task distJar(dependsOn: classes, type: Jar) {
+    manifest {
+        attributes("Implementation-Title": "Denominator DiscoveryDNS", "Specification-Version": version, "Implementation-Version": version)
+    }
+}
 
 test {
     systemProperty 'discoverydns.url', System.getProperty('discoverydns.url', '')
@@ -24,4 +34,15 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:1.7.1'
   testCompile 'com.squareup.okhttp:mockwebserver:2.2.0'
+  testCompile 'org.bouncycastle:bcpkix-jdk15on:1.50'
+}
+
+artifacts {
+    archives distJar
+}
+
+uploadArchives {
+    repositories {
+        add project.repositories.distFolder
+    }
 }

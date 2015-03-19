@@ -163,19 +163,27 @@ public class DiscoveryDNSProvider extends BasicProvider {
     }
 
     static SSLSocketFactory sslSocketFactory(Credentials creds) {
-      final X509Certificate certificate;
-      final PrivateKey privateKey;
+      X509Certificate certificate = null;
+      PrivateKey privateKey = null;
       if (creds instanceof List) {
         @SuppressWarnings("unchecked")
         List<Object> listCreds = (List<Object>) creds;
-        certificate = (X509Certificate) listCreds.get(0);
-        privateKey = (PrivateKey) listCreds.get(1);
+        try {
+          certificate = (X509Certificate) listCreds.get(0);
+          privateKey = (PrivateKey) listCreds.get(1);
+        } catch (ClassCastException e) {
+          //Will fail gracefully later
+        }
       } else if (creds instanceof Map) {
         @SuppressWarnings("unchecked")
         Map<String, Object> mapCreds = (Map<String, Object>) creds;
-        certificate =
-            (X509Certificate) checkNotNull(mapCreds.get("x509Certificate"), "x509Certificate");
-        privateKey = (PrivateKey) checkNotNull(mapCreds.get("privateKey"), "privateKey");
+        try {
+          certificate =
+              (X509Certificate) checkNotNull(mapCreds.get("x509Certificate"), "x509Certificate");
+          privateKey = (PrivateKey) checkNotNull(mapCreds.get("privateKey"), "privateKey");
+        } catch (ClassCastException e) {
+          //Will fail gracefully later
+        }
       } else {
         throw new IllegalArgumentException("Unsupported credential type: " + creds);
       }
@@ -190,9 +198,11 @@ public class DiscoveryDNSProvider extends BasicProvider {
       try {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(null, KEYSTORE_PASSWORD);
-        Certificate[] certificateChain = {certificate};
-        keyStore.setKeyEntry("privateKey", privateKey, KEYSTORE_PASSWORD, certificateChain);
-        keyStore.setCertificateEntry("x509Certificate", certificate);
+        if (certificate != null && privateKey != null) {
+          Certificate[] certificateChain = {certificate};
+          keyStore.setKeyEntry("privateKey", privateKey, KEYSTORE_PASSWORD, certificateChain);
+          keyStore.setCertificateEntry("x509Certificate", certificate);
+        }
         return keyStore;
       } catch (GeneralSecurityException e) {
         throw new IllegalArgumentException("Could not create a KeyStore", e);

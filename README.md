@@ -59,14 +59,16 @@ You can then use the following configuration in the YAML configuration file:
 name: discoverydns-prod
 provider: discoverydns
 credentials:
- certificatePem: |
- -----BEGIN CERTIFICATE-----
- [PEM CONTENT HERE]
- -----END CERTIFICATE-----
- keyPem: |
- -----BEGIN PRIVATE KEY-----
- [PEM CONTENT HERE]
- -----END PRIVATE KEY-----
+ x509Certificate:
+ |
+  -----BEGIN CERTIFICATE-----
+  [PEM CONTENT HERE]
+  -----END CERTIFICATE-----
+ privateKey:
+ |
+  -----BEGIN PRIVATE KEY-----
+  [PEM CONTENT HERE]
+  -----END PRIVATE KEY-----
 ```
 
 Then use the `-n` arg to select the named provider.
@@ -77,6 +79,6 @@ Or with environment variables:
 ```
 export DENOMINATOR_PROVIDER=discoverydns
 export DENOMINATOR_URL=https://alternative/rest/endpoint
-export DENOMINATOR_X509_CERTIFICATE=-----BEGIN CERTIFICATE-----[PEM CONTENT HERE]-----END CERTIFICATE-----
-export DENOMINATOR_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----[PEM CONTENT HERE]-----END PRIVATE KEY-----
+export DENOMINATOR_X509_CERTIFICATE=`-----BEGIN CERTIFICATE-----\n[PEM CONTENT HERE]\n-----END CERTIFICATE-----`
+export DENOMINATOR_PRIVATE_KEY=`-----BEGIN PRIVATE KEY-----\n[PEM CONTENT HERE]\n-----END PRIVATE KEY-----`
 ```

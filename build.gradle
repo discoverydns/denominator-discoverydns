@@ -10,7 +10,7 @@ repositories {
     }
 }
 apply from: file('dagger.gradle')
-version = "0.0.1"
+version = "0.0.2"
 
 task distJar(dependsOn: classes, type: Jar) {
     manifest {

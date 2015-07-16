@@ -24,12 +24,12 @@ Include the following dependencies in your Maven project:
        <dependency>
           <groupId>com.discoverydns.dnsapi</groupId>
           <artifactId>denominator-discoverydns</artifactId>
-          <version>0.0.1</version>
+          <version>0.0.2</version>
        </dependency>
        <dependency>
           <groupId>com.netflix.denominator</groupId>
           <artifactId>denominator-core</artifactId>
-          <version>8.1.0</version>
+          <version>4.5.0</version>
        </dependency>
     </dependencies>
 
@@ -37,8 +37,8 @@ Include the following dependencies in your Maven project:
 Include the following dependencies in your Gradle project:
 
     dependencies {
-       compile 'com.discoverydns.dnsapi:denominator-discoverydns:0.0.1'
-       compile 'com.netflix.denominator:denominator-core:4.4.2'
+       compile 'com.discoverydns.dnsapi:denominator-discoverydns:0.0.2'
+       compile 'com.netflix.denominator:denominator-core:4.5.0'
     }
 
 ### In the code
@@ -82,3 +82,40 @@ export DENOMINATOR_URL=https://alternative/rest/endpoint
 export DENOMINATOR_X509_CERTIFICATE=`-----BEGIN CERTIFICATE-----\n[PEM CONTENT HERE]\n-----END CERTIFICATE-----`
 export DENOMINATOR_PRIVATE_KEY=`-----BEGIN PRIVATE KEY-----\n[PEM CONTENT HERE]\n-----END PRIVATE KEY-----`
 ```
+
+Note: DiscoveryDNS is only available as a CLI provider for Denominator v4.6 onwards.
+
+### Additional configuration for Zone Create/Update
+To use the Zone Create and Zone Update operations,
+ some additional parameters need to be passed to the DiscoveryDNS Denominator Provider:
+* The id of the nameServerSet to use for the zone, to configure the proper nameServer names.
+* The id of the plan to use for the zone, to configure the usable functionalities and the allowed usage.
+* An indication if the zone should use the branded nameServers functionality (if the chosen plan enables it).
+* An indication if the zone should use the DNSSEC functionality (if the chosen plan enables it).
+* The name of the group to put the zone in (if the chosen plan enables grouping).
+This is done either programmatically by setting the local thread configuration on the Provider:
+
+```
+discoveryDNSProvider.getLocalConfiguration().setNameServerSetId("myNameServerSetId");
+discoveryDNSProvider.getLocalConfiguration().setPlanId("myPlanId");
+discoveryDNSProvider.getLocalConfiguration().setBrandedNameServers(true);
+discoveryDNSProvider.getLocalConfiguration().setDnssecSigned(false);
+discoveryDNSProvider.getLocalConfiguration().setGroup("myGroup");
+String zoneId = manager.api().zones().put(Zone.create("my-zone-name.com", null));
+```
+
+Or (especially for the CLI), by a ".discoverydnsconfig" configuration file,
+ which values will then be used for all subsequent calls to the Zone Create or Update operations:
+
+```
+nameServerSetId: myNameServerSetId
+planId: myPlanId
+brandedNameServers: true
+dnssecSigned: false
+group: myGroup
+```
+
+This file will be looked for, during startup, in the following folders:
+* .
+* ./3rdparty/
+* ~

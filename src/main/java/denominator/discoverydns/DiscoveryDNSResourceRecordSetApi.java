@@ -32,21 +32,21 @@ final class DiscoveryDNSResourceRecordSetApi implements ResourceRecordSetApi {
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
     List<ResourceRecordSet<?>> records = api.getZone(zoneId).zone.resourceRecords.records;
-    return filter(records.iterator(), nameEqualTo(name));
+    return filter(records.iterator(), nameEqualTo(appendDotToRecordNameIfNecessary(name)));
   }
 
   @Override
   public ResourceRecordSet<?> getByNameAndType(String name, String type) {
     List<ResourceRecordSet<?>> records = api.getZone(zoneId).zone.resourceRecords.records;
-    return nextOrNull(filter(records.iterator(), nameAndTypeEqualTo(name, type)));
+    return nextOrNull(filter(records.iterator(), nameAndTypeEqualTo(appendDotToRecordNameIfNecessary(name), type)));
   }
 
-  private void updateResourceRecords(String zoneId, final String name, final String type,
+  private void updateResourceRecords(String zoneId, String name, String type,
                                      ResourceRecordSet<?>... appends) {
     DiscoveryDNS.Zone ddnsZone = api.getZone(zoneId);
     List<ResourceRecordSet<?>> records = new ArrayList<ResourceRecordSet<?>>();
     for (ResourceRecordSet<?> record : ddnsZone.zone.resourceRecords.records) {
-      if (!name.equals(record.name()) || !type.equals(record.type())
+      if (!appendDotToRecordNameIfNecessary(name).equals(record.name()) || !type.equals(record.type())
           && (appends.length == 0 || !appends[0].ttl().equals(record.ttl()))) {
         records.add(record);
       }
@@ -58,7 +58,7 @@ final class DiscoveryDNSResourceRecordSetApi implements ResourceRecordSetApi {
     DiscoveryDNS.Zone ddnsUpdateZone = new DiscoveryDNS.Zone();
     ddnsUpdateZone.zoneUpdateResourceRecords = ddnsZone.zone;
     ddnsUpdateZone.zoneUpdateResourceRecords.resourceRecords.records = records;
-    api.updateZone(zoneId, ddnsUpdateZone);
+    api.updateZoneRecords(zoneId, ddnsUpdateZone);
   }
 
   @Override
@@ -69,6 +69,10 @@ final class DiscoveryDNSResourceRecordSetApi implements ResourceRecordSetApi {
   @Override
   public void deleteByNameAndType(String name, String type) {
     updateResourceRecords(zoneId, name, type);
+  }
+
+  private String appendDotToRecordNameIfNecessary(String recordName) {
+    return recordName == null ? null : (recordName.endsWith(".") ? recordName : recordName + ".");
   }
 
   static final class Factory implements denominator.ResourceRecordSetApi.Factory {

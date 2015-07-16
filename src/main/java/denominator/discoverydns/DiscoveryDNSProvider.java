@@ -1,8 +1,5 @@
 package denominator.discoverydns;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -23,6 +20,9 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import dagger.Provides;
 import denominator.BasicProvider;
@@ -46,6 +46,8 @@ import feign.gson.GsonEncoder;
 import static denominator.common.Preconditions.checkNotNull;
 
 public class DiscoveryDNSProvider extends BasicProvider {
+  private static final LocalDiscoveryDNSConfiguration localDiscoveryDNSConfiguration
+      = new LocalDiscoveryDNSConfiguration();
 
   private final String url;
 
@@ -60,6 +62,10 @@ public class DiscoveryDNSProvider extends BasicProvider {
   @Override
   public String url() {
     return url;
+  }
+
+  public LocalDiscoveryDNSConfiguration getLocalConfiguration() {
+    return localDiscoveryDNSConfiguration;
   }
 
   @Override
@@ -105,7 +111,7 @@ public class DiscoveryDNSProvider extends BasicProvider {
     @Provides
     @Singleton
     ZoneApi provideZoneApi(DiscoveryDNS api) {
-      return new DiscoveryDNSZoneApi(api);
+      return new DiscoveryDNSZoneApi(api, localDiscoveryDNSConfiguration);
     }
 
     @Provides

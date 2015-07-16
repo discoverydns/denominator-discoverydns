@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import denominator.model.ResourceRecordSet;
+import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -19,11 +20,27 @@ interface DiscoveryDNS {
   @RequestLine("GET /zones")
   Zones listZones();
 
+  @RequestLine("GET /zones?searchName={name}&searchNameSearchType=exactMatch")
+  Zones listZonesByName(@Param("name") String name);
+
   @RequestLine("GET /zones/{id}")
   Zone getZone(@Param("id") String id);
 
+  @RequestLine("POST /zones")
+  @Body("%7B\"zoneCreate\": %7B\"name\":\"{name}\",\"dnssecSigned\":{dnssecSigned},\"brandedNameServers\":{brandedNameServers},\"nameServerSetId\":\"{nameServerSetId}\",\"planId\":\"{planId}\",\"group\":\"{group}\"%7D%7D")
+  @Headers("Content-Type: application/json")
+  Zone createZone(@Param("name") String name, @Param("dnssecSigned") Boolean dnssecSigned, @Param("brandedNameServers") Boolean brandedNameServers, @Param("nameServerSetId") String nameServerSetId, @Param("planId") String planId, @Param("group") String group);
+
+  @RequestLine("PUT /zones/{id}")
+  @Body("%7B\"zoneUpdate\": %7B\"version\":{version},\"dnssecSigned\":{dnssecSigned},\"brandedNameServers\":{brandedNameServers},\"nameServerSetId\":\"{nameServerSetId}\",\"planId\":\"{planId}\",\"group\":\"{group}\"%7D%7D")
+  @Headers("Content-Type: application/json")
+  Zone updateZone(@Param("id") String id, @Param("version") Long version, @Param("dnssecSigned") Boolean dnssecSigned, @Param("brandedNameServers") Boolean brandedNameServers, @Param("nameServerSetId") String nameServerSetId, @Param("planId") String planId, @Param("group") String group);
+
   @RequestLine("PUT /zones/{id}/resourcerecords")
-  void updateZone(@Param("id") String id, Zone zone);
+  void updateZoneRecords(@Param("id") String id, Zone zone);
+
+  @RequestLine("DELETE /zones/{id}")
+  void deleteZone(@Param("id") String id);
 
   static final class ResourceRecords {
 

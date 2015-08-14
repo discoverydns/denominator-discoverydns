@@ -1,3 +1,6 @@
+### Version 0.0.3
+* Integrate with Denominator v4.7
+
 ### Version 0.0.2
 * Integrate with Denominator v4.5
 * Add Zone List by name

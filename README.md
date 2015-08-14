@@ -29,7 +29,7 @@ Include the following dependencies in your Maven project:
        <dependency>
           <groupId>com.netflix.denominator</groupId>
           <artifactId>denominator-core</artifactId>
-          <version>4.5.0</version>
+          <version>4.7.0</version>
        </dependency>
     </dependencies>
 
@@ -38,7 +38,7 @@ Include the following dependencies in your Gradle project:
 
     dependencies {
        compile 'com.discoverydns.dnsapi:denominator-discoverydns:0.0.2'
-       compile 'com.netflix.denominator:denominator-core:4.5.0'
+       compile 'com.netflix.denominator:denominator-core:4.7.0'
     }
 
 ### In the code
@@ -82,8 +82,6 @@ export DENOMINATOR_URL=https://alternative/rest/endpoint
 export DENOMINATOR_X509_CERTIFICATE=`-----BEGIN CERTIFICATE-----\n[PEM CONTENT HERE]\n-----END CERTIFICATE-----`
 export DENOMINATOR_PRIVATE_KEY=`-----BEGIN PRIVATE KEY-----\n[PEM CONTENT HERE]\n-----END PRIVATE KEY-----`
 ```
-
-Note: DiscoveryDNS is only available as a CLI provider for Denominator v4.6 onwards.
 
 ### Additional configuration for Zone Create/Update
 To use the Zone Create and Zone Update operations,

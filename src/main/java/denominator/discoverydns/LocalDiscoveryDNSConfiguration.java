@@ -111,4 +111,8 @@ public class LocalDiscoveryDNSConfiguration {
   public void setNameServerSetId(String nameServerSetId) {
     getLocalConfiguration().nameServerSetId = nameServerSetId;
   }
+
+  public void useDefaultConfiguration() {
+    getLocalConfiguration();
+  }
 }

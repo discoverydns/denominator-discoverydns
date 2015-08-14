@@ -26,16 +26,16 @@ test {
 }
 
 dependencies {
-  compile 'com.netflix.denominator:denominator-core:4.5.1'
-  compile 'com.netflix.feign:feign-core:8.1.0'
-  compile 'com.netflix.feign:feign-gson:8.1.0'
+  compile 'com.netflix.denominator:denominator-core:4.7.0'
+  compile 'com.netflix.feign:feign-core:8.7.1'
+  compile 'com.netflix.feign:feign-gson:8.7.1'
   compile 'org.yaml:snakeyaml:1.15'
 
-  testCompile group: 'com.netflix.denominator', name: 'denominator-core', version: '4.5.1', classifier: 'tests'
-  testCompile group: 'com.netflix.denominator', name: 'denominator-model', version: '4.5.1', classifier: 'tests'
+  testCompile group: 'com.netflix.denominator', name: 'denominator-core', version: '4.7.0', classifier: 'tests'
+  testCompile group: 'com.netflix.denominator', name: 'denominator-model', version: '4.7.0', classifier: 'tests'
   testCompile 'junit:junit:4.12'
-  testCompile 'org.assertj:assertj-core:1.7.1'
-  testCompile 'com.squareup.okhttp:mockwebserver:2.2.0'
+  testCompile 'org.assertj:assertj-core:1.7.1' // last version supporting JDK 7
+  testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
   testCompile 'org.bouncycastle:bcpkix-jdk15on:1.50'
 }
 

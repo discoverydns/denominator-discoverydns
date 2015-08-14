@@ -42,8 +42,9 @@ public class DiscoveryDNSTestGraph extends TestGraph {
   @Override
   protected DNSApiManager manager() {
     Object credentials = credentials(getTestX509Certificate(), getTestPrivateKey());
-    return Denominator.create(new DiscoveryDNSProvider(url), credentials);
-    //return Denominator.create(new DiscoveryDNSProvider(url), credentials, new HttpLog());
+    DiscoveryDNSProvider discoveryDNSProvider = new DiscoveryDNSProvider(url);
+    discoveryDNSProvider.getLocalConfiguration().useDefaultConfiguration();
+    return Denominator.create(discoveryDNSProvider, credentials, new DNSApiManagerFactory.HttpLog());
   }
 
   @Override

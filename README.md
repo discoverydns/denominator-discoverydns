@@ -24,7 +24,7 @@ Include the following dependencies in your Maven project:
        <dependency>
           <groupId>com.discoverydns.dnsapi</groupId>
           <artifactId>denominator-discoverydns</artifactId>
-          <version>0.0.2</version>
+          <version>0.0.3</version>
        </dependency>
        <dependency>
           <groupId>com.netflix.denominator</groupId>
@@ -37,7 +37,7 @@ Include the following dependencies in your Maven project:
 Include the following dependencies in your Gradle project:
 
     dependencies {
-       compile 'com.discoverydns.dnsapi:denominator-discoverydns:0.0.2'
+       compile 'com.discoverydns.dnsapi:denominator-discoverydns:0.0.3'
        compile 'com.netflix.denominator:denominator-core:4.7.0'
     }
 
